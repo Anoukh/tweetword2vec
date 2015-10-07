@@ -1,0 +1,159 @@
+---
+title: "TwitterReport"
+output: html_document
+---
+
+
+
+
+```{r echo=FALSE, message=FALSE}
+library(dplyr)
+library(stringr)
+library(igraph)
+library(ggvis)
+
+source("tweetUtils.R")
+retweets <- createRetweetGraph("election2016.csv");
+#retweets <- createRetweetGraph("/Users/srinath/playground/data-science/text-analytics/electionTags_aug22.csv");
+#verticesName <- union(retweets$from, retweets$from_user)
+#edges <- data.frame(from=retweets$from, to=retweets$from_user)
+#g <- graph.data.frame(edges, directed=TRUE)
+
+g <- createWeightedGraph(retweets)
+
+
+l3 <- layout_with_drl(g)
+#l3 <- layout_with_dh(g)
+g <- configureLabels(g)
+```
+
+Number of people who retweeted and the number of twitter accounts. 
+```{r}
+length(E(g))
+length(V(g))
+```
+
+
+Few authors have received most of the tweets. 
+```{r}
+retweetsBuAuth <- retweets %>% group_by(from) %>% summarise(tot = sum(count)) %>% arrange(desc(tot))
+drawLogLogPlot(retweetsBuAuth$tot, "Number of Retweets")
+quantile(retweetsBuAuth$tot, c(.75,.85,.95,0.99,0.999))
+#first 10
+topAuth<-head(retweetsBuAuth$tot, 10)
+
+
+sum(topAuth)
+#all
+sum(retweetsBuAuth$tot)
+filter(retweetsBuAuth, tot > 300)
+```
+
+
+degree distribution 
+```{r}
+graphDegree <- degree(g, mode="out")
+drawLogLogPlot(graphDegree, "Node In Degree")
+quantile(graphDegree, c(.75,.85,.95,0.99,0.999))
+tail(sort(graphDegree),10)
+```
+
+Diameter, Mean distance
+```{r}
+diameter(g)
+mean_distance(g)
+```
+
+Cluster cofficent
+```{r}
+transitivity(g) 
+```
+
+Main players in info flow
+```{r}
+bc <-betweenness(g) 
+tail(sort(bc),10)
+```
+
+Hubs and Authorities
+```{r}
+auth <- authority.score(g)$vector
+hub <- hub.score(g)$vector
+tail(sort(auth),10)
+tail(sort(hub),10)
+```
+
+Draw Network
+```{r}
+plot(g, layout=l3, edge.arrow.size=0.1, edge.arrow.width=0.6, edge.width=1, vertex.color="white", vertex.label.color="black")
+#vertex.frame.color="blue", 
+```
+
+
+
+
+Find Walktrap Community and Draw it
+```{r}
+com <- walktrap.community(g)
+modularity(com)
+
+member <- membership(com)
+colors <-rainbow(10, .8, .8, alpha=.8)[member]
+plot(g, layout=l3, vertex.color=colors, edge.arrow.size=.1, vertex.label.color="black")
+```
+
+
+Find Betweeness Community and Draw it
+```{r}
+#com <- edge.betweenness.community(g)
+modularity(com)
+
+member <- membership(com)
+colors <-rainbow(10, .8, .8, alpha=.8)[member]
+plot(g, layout=l3, vertex.color=colors, edge.arrow.size=.2, vertex.label.color="black")
+
+
+#heat map of followers and number of tweets vs retweets received..
+```
+
+
+#heat map of followers and number of tweets vs retweets received..
+```{r}
+#com <- edge.betweenness.community(g)
+modularity(com)
+
+member <- membership(com)
+colors <-rainbow(10, .8, .8, alpha=.8)[member]
+plot(g, layout=l3, vertex.color=colors, edge.arrow.size=.2, vertex.label.color="black")
+
+
+#heat map of followers and number of tweets vs retweets received..
+```
+
+
+Relationship between followers and tweets
+```{r}
+
+#tweetData <- createTweetsDataFromRawTweets("/Users/srinath/playground/data-science/text-analytics/data/bigdata/2015-aug.csv")
+#retweetCount <- tweetData %>% group_by(from) %>% summarise(retweets = sum(count))
+
+                             
+#rawTweets<-read.csv("/Users/srinath/playground/data-science/text-analytics/data/bigdata/2015-aug.csv")
+#rtToRaw  <- str_match(rawTweets$text, "RT @([A-z0-9]*):.*");
+#rawTweets$from <- rtToRaw[,2];
+#tweets <-filter(rawTweets, is.na(from))
+#tweetCountAndFollowers <- tweets %>% group_by(from_user) %>% summarise(tweets = length(text), followers =max(user_followers_count))
+
+
+
+#joined <-left_join(retweetCount, tweetCountAndFollowers, by = c("from" = "from_user"))
+#set NA to 0 
+#joined[is.na(joined)] <- 0
+
+#joined %>% ggvis(~tweets, ~followers) %>% layer_points() %>%  scale_numeric("x", trans="log") %>% add_axis("y", title_offset = 70)
+
+#library(ggplot2)
+#ggplot(joined, aes(x=tweets, y=followers, color=log(retweets), size=log(retweets))) +
+#    geom_point(shape=1)  + scale_x_log10() + scale_y_log10() + scale_colour_gradientn(colours=c#("white", "blue"))
+
+#write.csv(joined, file = "/Users/srinath/playground/data-science/text-analytics/FollowersAnsTweets.csv")
