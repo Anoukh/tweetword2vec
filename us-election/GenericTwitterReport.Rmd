@@ -13,17 +13,13 @@ library(igraph)
 library(ggvis)
 
 source("tweetUtils.R")
-retweets <- createRetweetGraph("election2016.csv");
-#retweets <- createRetweetGraph("/Users/srinath/playground/data-science/text-analytics/electionTags_aug22.csv");
-#verticesName <- union(retweets$from, retweets$from_user)
-#edges <- data.frame(from=retweets$from, to=retweets$from_user)
-#g <- graph.data.frame(edges, directed=TRUE)
+retweets <- createRetweetGraph("election2016.csv", 2);
 
 g <- createWeightedGraph(retweets)
 
 
-l3 <- layout_with_drl(g)
-#l3 <- layout_with_dh(g)
+#l3 <- layout_with_drl(g)
+l3 <- layout_with_dh(g)
 g <- configureLabels(g)
 ```
 
@@ -131,29 +127,3 @@ plot(g, layout=l3, vertex.color=colors, edge.arrow.size=.2, vertex.label.color="
 ```
 
 
-Relationship between followers and tweets
-```{r}
-
-#tweetData <- createTweetsDataFromRawTweets("/Users/srinath/playground/data-science/text-analytics/data/bigdata/2015-aug.csv")
-#retweetCount <- tweetData %>% group_by(from) %>% summarise(retweets = sum(count))
-
-                             
-#rawTweets<-read.csv("/Users/srinath/playground/data-science/text-analytics/data/bigdata/2015-aug.csv")
-#rtToRaw  <- str_match(rawTweets$text, "RT @([A-z0-9]*):.*");
-#rawTweets$from <- rtToRaw[,2];
-#tweets <-filter(rawTweets, is.na(from))
-#tweetCountAndFollowers <- tweets %>% group_by(from_user) %>% summarise(tweets = length(text), followers =max(user_followers_count))
-
-
-
-#joined <-left_join(retweetCount, tweetCountAndFollowers, by = c("from" = "from_user"))
-#set NA to 0 
-#joined[is.na(joined)] <- 0
-
-#joined %>% ggvis(~tweets, ~followers) %>% layer_points() %>%  scale_numeric("x", trans="log") %>% add_axis("y", title_offset = 70)
-
-#library(ggplot2)
-#ggplot(joined, aes(x=tweets, y=followers, color=log(retweets), size=log(retweets))) +
-#    geom_point(shape=1)  + scale_x_log10() + scale_y_log10() + scale_colour_gradientn(colours=c#("white", "blue"))
-
-#write.csv(joined, file = "/Users/srinath/playground/data-science/text-analytics/FollowersAnsTweets.csv")
