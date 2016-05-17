@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <title>Vega Test Interact with jstat</title>
+    <link rel="stylesheet" href="http://trifacta.github.io/vega/css/vega.css"/>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://trifacta.github.io/vega/vega.js"></script>
+    
+    <style>
+* { font-family: Helvetica Neue, Helvetica, Arial, sans-serif; }
+body { width: 450px; line-height: 16pt; }
+    </style>
+  </head>
+  <body>
+    <p><strong>Vega Test Interact with jstat</strong></p>
+    <div id="view" class="view"></div>
+    <p>This example combines some of the examples included in the vega.js package
+      to do a scatter plot of a normal distribution provided by jstat.</p>
+  </body>
+  <script type="text/javascript">
+var spec = {
+  "width": 400,
+  "height": 200,
+  "padding": {"top": 10, "left": 30, "bottom": 30, "right": 10},
+  "data": [{"name" : "points"}],
+    "scales": [
+    {
+      "name": "x",
+      "nice": true,
+      "range": "width",
+      "domain": {"data": "points", "field": "data.x"}
+    },
+    {
+      "name": "y",
+      "nice": true,
+      "range": "height",
+      "domain": {"data": "points", "field": "data.y"}
+    }
+  ],
+  "axes": [
+    {"type": "x", "scale": "x"},
+    {"type": "y", "scale": "y"}
+  ],
+  "marks": [
+    {
+      "type": "symbol",
+      "from": {"data": "points"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.x"},
+          "y": {"scale": "y", "field": "data.y"},
+          "stroke": {"value": "steelblue"},
+          "fillOpacity": {"value": 0.5}
+        },
+        "update": {
+          "fill": {"value": "transparent"},
+          "size": {"value": 100}
+        },
+        "hover": {
+          "fill": {"value": "pink"},
+          "size": {"value": 300}
+        }
+      }
+    }
+  ]
+};
+
+//in the spec we set up an empty data holder "data": [{"name" : "points"}]
+//we will combine the x, y set above by jstat into an object of an array called points of {x,y} objects
+var data = { "points" : [] };
+x.forEach(function(d,i){data.points.push({"x":x[i],"y":y[i]});});      
+
+
+vg.parse.spec(spec, function(chart) {
+  var view = chart({el:"#view", data:data})  //here is where we populate the empty spec data holder with our calculated data
+    .update();
+});
+  </script>
+</html>

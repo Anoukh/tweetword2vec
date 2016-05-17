@@ -1,0 +1,83 @@
+<html>
+  <head>
+    <title>Vega Scaffold</title>
+    <script src="https://vega.github.io/vega-editor/vendor/d3.min.js"></script>
+    <script src="https://vega.github.io/vega-editor/vendor/d3.geo.projection.min.js"></script>
+    <script src="https://vega.github.io/vega-editor/vendor/topojson.js"></script>
+    <script src="https://vega.github.io/vega-editor/vendor/d3.layout.cloud.js"></script>
+    <script src="https://vega.github.io/vega/vega.min.js"></script>
+  </head>
+  <body>
+    <div id="vis"></div>
+  </body>
+<script type="text/javascript">
+// parse a spec and create a visualization view
+function parse(spec , data) {
+  vg.parse.spec(spec, function(chart) {
+	  var view = chart({el:"#view", data:data})  //here is where we populate the empty spec data holder with our calculated data
+	    .update();
+	});
+}
+
+
+
+var wcspec = {
+		  "name": "wordcloud",
+		  "width": 400,
+		  "height": 400,
+		  "padding": {"top":0, "bottom":0, "left":0, "right":0},
+		  "data": [
+		    {
+		      "name": "table",
+		      "values": [
+		        {"text": "poem", "value": 80},
+		        {"text": "peom", "value": 44},
+		        {"text": "moep", "value": 40},
+		        {"text": "meop", "value": 36},
+		        {"text": "emop", "value": 32},
+		        {"text": "epom", "value": 28},
+		        {"text": "opem", "value": 24},
+		        {"text": "omep", "value": 20},
+		        {"text": "mope", "value": 56},
+		        {"text": "mepo", "value": 12},
+		        {"text": "pemo", "value": 10},
+		        {"text": "pome", "value": 10}
+		      ],
+		      "transform": [
+		        {
+		          "type": "wordcloud",
+		          "text": "data.text",
+		          "font": "Helvetica Neue",
+		          "fontSize": "data.value"
+		        }
+		      ]
+		    }
+		  ],
+		  "marks": [
+		    {
+		      "type": "text",
+		      "from": {"data": "table"},
+		      "properties": {
+		        "enter": {
+		          "x": {"field": "x"},
+		          "y": {"field": "y"},
+		          "angle": {"field": "angle"},
+		          "align": {"value": "center"},
+		          "baseline": {"value": "alphabetic"},
+		          "font": {"field": "font"},
+		          "fontSize": {"field": "fontSize"},
+		          "text": {"field": "data.text"}
+		        },
+		        "update": {
+		          "fill": {"value": "steelblue"}
+		        },
+		        "hover": {
+		          "fill": {"value": "#f00"}
+		        }
+		      }
+		    }
+		  ]
+		};
+parse(wcspec);
+</script>
+</html>
